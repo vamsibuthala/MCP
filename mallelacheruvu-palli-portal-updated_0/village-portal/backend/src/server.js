@@ -63,12 +63,21 @@ async function start() {
     res.status(err.status || 500).json({ detail: err.message || 'Internal server error' });
   });
 
-  app.listen(config.port, () => {
-    console.log(`Mallelacheruvu Palli Portal API listening on port ${config.port}`);
-  });
+  if (process.env.NODE_ENV !== 'production' && !process.env.VERCEL) {
+    app.listen(config.port, () => {
+      console.log(`Mallelacheruvu Palli Portal API listening on port ${config.port}`);
+    });
+  }
+  
+  return app;
 }
 
-start().catch((err) => {
+const appPromise = start().catch((err) => {
   console.error('Failed to start server:', err);
   process.exit(1);
 });
+
+module.exports = async (req, res) => {
+  const app = await appPromise;
+  return app(req, res);
+};
