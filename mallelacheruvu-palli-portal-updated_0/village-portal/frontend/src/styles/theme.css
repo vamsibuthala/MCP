@@ -1,0 +1,305 @@
+/* ============================================================
+   Mallelacheruvu Palli — design tokens
+   "Malle" (jasmine) + "Cheruvu" (pond/tank) + "Palli" (village) —
+   the palette and motifs are drawn from that: jasmine white,
+   paddy green, tank-water teal, temple-gopuram terracotta,
+   turmeric gold. The signature motif is a ripple + jasmine-sprig
+   divider used between sections.
+   ============================================================ */
+
+:root {
+  /* Color */
+  --color-bg: #FBF8F1;           /* jasmine-white background */
+  --color-bg-alt: #F3EEE1;       /* slightly deeper cream for alt sections */
+  --color-ink: #2B2620;          /* charcoal text */
+  --color-ink-soft: #5B5346;     /* muted body text */
+  --color-paddy: #3F6B3D;        /* primary green — fields */
+  --color-paddy-dark: #2C4C2A;
+  --color-tank: #2E6068;         /* pond/tank teal */
+  --color-terracotta: #BD5A2A;   /* temple gopuram accent */
+  --color-turmeric: #D9A441;     /* festival gold */
+  --color-white: #FFFFFF;
+  --color-line: rgba(43, 38, 32, 0.12);
+
+  /* Type */
+  --font-display: 'Fraunces', 'Georgia', serif;
+  --font-body: 'Manrope', system-ui, sans-serif;
+  --font-telugu: 'Hanuman', 'Noto Sans Telugu', serif;
+  --font-accent: 'Caveat', 'Segoe Script', cursive;  /* hand-brushed, signage-style accent */
+
+  /* Layout */
+  --radius-lg: 22px;
+  --radius-md: 14px;
+  --radius-sm: 8px;
+  --shadow-soft: 0 12px 32px rgba(43, 38, 32, 0.08);
+  --shadow-card: 0 6px 18px rgba(43, 38, 32, 0.07);
+  --max-width: 1180px;
+  --section-pad: clamp(56px, 8vw, 104px);
+}
+
+* { box-sizing: border-box; }
+
+html, body { max-width: 100%; overflow-x: hidden; }
+html { scroll-behavior: smooth; }
+
+img, svg, video { max-width: 100%; }
+
+/* Village-scene background: a repeating silhouette strip of huts, palms,
+   a temple gopuram peak and a rising sun, sitting low behind the content,
+   layered over the jute-weave cross-hatch + kolam dot texture. Fixed to
+   the viewport so it reads as a single continuous village skyline rather
+   than repeating awkwardly per-page. */
+body {
+  margin: 0;
+  background-color: var(--color-bg);
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='420' height='150' viewBox='0 0 420 150'%3E%3Cg fill='%233F6B3D' fill-opacity='0.055'%3E%3Ccircle cx='360' cy='34' r='22'/%3E%3Cpath d='M0 150 L0 118 L26 118 L26 100 L52 100 L52 118 L78 118 L78 150 Z'/%3E%3Cpath d='M60 150 L60 108 L96 84 L132 108 L132 150 Z'/%3E%3Crect x='96' y='120' width='16' height='30'/%3E%3Cpath d='M150 150 L150 96 L166 80 L182 96 L182 150 Z'/%3E%3Cpath d='M162 40 Q166 60 162 90 M166 45 Q170 65 166 92 M170 40 Q174 60 170 90' stroke='%233F6B3D' stroke-opacity='0.07' stroke-width='3' fill='none'/%3E%3Cpath d='M210 150 L210 112 L236 112 L236 92 L262 92 L262 112 L288 112 L288 150 Z'/%3E%3Cpath d='M300 150 L300 100 L322 80 L344 100 L344 150 Z' /%3E%3Cpath d='M300 78 L322 58 L344 78 Z'/%3E%3Cpath d='M356 40 Q360 60 356 90 M360 44 Q364 64 360 91' stroke='%233F6B3D' stroke-opacity='0.07' stroke-width='3' fill='none'/%3E%3Cpath d='M380 150 L380 116 L406 116 L406 96 L420 96 L420 150 Z'/%3E%3C/g%3E%3C/svg%3E"),
+    repeating-linear-gradient(45deg, rgba(43,38,32,0.025) 0, rgba(43,38,32,0.025) 1px, transparent 1px, transparent 10px),
+    repeating-linear-gradient(-45deg, rgba(43,38,32,0.02) 0, rgba(43,38,32,0.02) 1px, transparent 1px, transparent 10px),
+    radial-gradient(circle, rgba(189,90,42,0.06) 1px, transparent 1.4px);
+  background-position: bottom left, top left, top left, top left;
+  background-repeat: repeat-x, repeat, repeat, repeat;
+  background-attachment: fixed, scroll, scroll, scroll;
+  background-size: 420px 150px, auto, auto, 26px 26px;
+  color: var(--color-ink);
+  font-family: var(--font-body);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4 {
+  font-family: var(--font-display);
+  color: var(--color-paddy-dark);
+  line-height: 1.12;
+  margin: 0 0 0.5em;
+  font-weight: 600;
+}
+
+h1 { font-size: clamp(2.4rem, 5vw, 4rem); font-weight: 700; }
+h2 { font-size: clamp(1.8rem, 3.4vw, 2.6rem); }
+h3 { font-size: clamp(1.25rem, 2vw, 1.55rem); }
+
+p { margin: 0 0 1em; color: var(--color-ink-soft); }
+
+a { color: var(--color-tank); text-decoration: none; }
+
+.container {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.section {
+  padding: var(--section-pad) 0;
+}
+
+.section--alt {
+  background-color: var(--color-bg-alt);
+  background-image: radial-gradient(circle, rgba(63,107,61,0.09) 1.6px, transparent 1.8px);
+  background-size: 30px 30px;
+}
+
+.eyebrow {
+  font-family: var(--font-accent);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  font-size: 1.5rem;
+  color: var(--color-terracotta);
+  display: inline-block;
+  margin-bottom: 0.3em;
+  line-height: 1;
+}
+.eyebrow::before {
+  content: '\1F343';  /* leaf */
+  margin-right: 6px;
+  font-size: 0.7em;
+  filter: saturate(1.1);
+}
+
+/* Hand-brushed accent text — used for the closing village quote and other
+   signage-style flourishes that should stand apart from ordinary body copy. */
+.accent-text {
+  font-family: var(--font-accent);
+  font-weight: 700;
+}
+
+/* Village nav — links styled as soft pill buttons rather than plain text,
+   arranged in a neat row (wrapping to their own rows on smaller screens). */
+.nav-links {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+.nav-links a {
+  padding: 8px 18px !important;
+  border-radius: 999px;
+  border-bottom: none !important;
+  background: rgba(63, 107, 61, 0.08);
+  white-space: nowrap;
+  transition: background 0.18s ease, color 0.18s ease, transform 0.18s ease;
+}
+.nav-links a:hover {
+  background: rgba(63, 107, 61, 0.16);
+  transform: translateY(-1px);
+}
+.nav-links a[aria-current="page"],
+.nav-links a.active {
+  background: var(--color-paddy) !important;
+  color: var(--color-white) !important;
+}
+@media (max-width: 980px) {
+  .nav-links { flex-wrap: wrap; }
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 13px 26px;
+  border-radius: 999px;
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 0.95rem;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  text-align: center;
+}
+.btn:hover { 
+  transform: translateY(-3px); 
+  box-shadow: 0 8px 20px rgba(63, 107, 61, 0.2); 
+}
+.btn:focus-visible { outline: 3px solid var(--color-turmeric); outline-offset: 2px; }
+
+.btn--primary {
+  background: var(--color-paddy);
+  color: var(--color-white);
+  box-shadow: var(--shadow-soft);
+}
+.btn--primary:hover { background: var(--color-paddy-dark); }
+
+.btn--secondary {
+  background: transparent;
+  border-color: var(--color-white);
+  color: var(--color-white);
+}
+.btn--secondary:hover { background: rgba(255,255,255,0.15); }
+
+.btn--outline {
+  background: transparent;
+  border-color: var(--color-paddy);
+  color: var(--color-paddy-dark);
+}
+.btn--outline:hover { background: var(--color-paddy); color: var(--color-white); }
+
+.card {
+  position: relative;
+  background: var(--color-white);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card);
+  padding: 28px;
+  overflow: hidden;
+  transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  animation: fadeUp 0.5s ease-out forwards;
+}
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(15px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.card::before {
+  /* Temple-gopuram tri-band accent along the top edge of every card */
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 5px;
+  background: linear-gradient(90deg, var(--color-terracotta) 0%, var(--color-terracotta) 33%, var(--color-turmeric) 33%, var(--color-turmeric) 66%, var(--color-paddy) 66%, var(--color-paddy) 100%);
+}
+.card:hover {
+  transform: translateY(-6px) scale(1.01);
+  box-shadow: 0 16px 40px rgba(43, 38, 32, 0.12);
+}
+
+/* Extra corner motif for feature cards (e.g. the People directory) —
+   small jasmine-sprig accents in the top corners. */
+.temple-stripe::after {
+  content: '';
+  position: absolute;
+  top: 5px; right: 10px;
+  width: 16px; height: 16px;
+  background-image: radial-gradient(circle at 30% 30%, var(--color-turmeric) 0 3px, transparent 3.2px);
+  opacity: 0.7;
+}
+
+.grid {
+  display: grid;
+  gap: 24px;
+}
+.grid--3 { grid-template-columns: repeat(3, 1fr); }
+.grid--4 { grid-template-columns: repeat(4, 1fr); }
+
+/* Responsive two-column layout used for "text beside image/list" sections
+   throughout the site (About teaser, news/events, gallery+memories, etc).
+   Falls back to a single stacked column on tablets and phones. */
+.grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+@media (max-width: 860px) {
+  .grid-2 { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 900px) {
+  .grid--3, .grid--4 { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 600px) {
+  .grid--3, .grid--4 { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 640px) {
+  .hero-section { min-height: auto !important; }
+  .hero-content { padding-top: 48px !important; padding-bottom: 88px !important; }
+}
+
+.demo-flag {
+  display: inline-block;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--color-terracotta);
+  background: rgba(189, 90, 42, 0.1);
+  padding: 3px 10px;
+  border-radius: 999px;
+  margin-left: 8px;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px; height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+}
+
+input, select, textarea {
+  transition: all 0.2s ease;
+}
+input:focus-visible, select:focus-visible, textarea:focus-visible {
+  outline: none;
+  border-color: var(--color-paddy) !important;
+  box-shadow: 0 0 0 3px rgba(63, 107, 61, 0.15) !important;
+}
+
+/* General mobile refinements — apply everywhere, not just the admin
+   dashboard, so the whole portal is comfortable on a phone. */
+@media (max-width: 640px) {
+  .container { padding: 0 16px; }
+  .btn { padding: 11px 20px; font-size: 0.9rem; }
+  input, select, textarea, button { font-size: 16px; } /* avoids iOS auto-zoom on focus */
+  table { display: block; overflow-x: auto; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; scroll-behavior: auto !important; }
+}

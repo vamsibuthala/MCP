@@ -1,0 +1,25 @@
+{
+  "name": "mallelacheruvu-palli-portal-backend",
+  "version": "1.0.0",
+  "description": "Backend API for the Mallelacheruvu Palli digital village portal (Node.js/Express + MongoDB)",
+  "main": "src/server.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "seed": "node src/seed.js"
+  },
+  "overrides": {
+    "qs": "^6.16.0"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.117.3",
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "jsonwebtoken": "^9.0.2",
+    "multer": "^2.0.0",
+    "uuid": "^11.1.1"
+  }
+}
