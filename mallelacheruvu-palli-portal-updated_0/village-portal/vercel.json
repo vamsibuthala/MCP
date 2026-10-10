@@ -13,22 +13,22 @@
       "use": "@vercel/node"
     }
   ],
-  "routes": [
+  "rewrites": [
     {
-      "src": "/api/(.*)",
-      "dest": "/backend/src/server.js"
+      "source": "/api/(.*)",
+      "destination": "/backend/src/server.js"
     },
     {
-      "src": "/uploads/(.*)",
-      "dest": "/backend/src/server.js"
+      "source": "/uploads/(.*)",
+      "destination": "/backend/src/server.js"
     },
     {
-      "src": "/(.*)",
-      "dest": "/frontend/$1"
+      "source": "/assets/(.*)",
+      "destination": "/frontend/assets/$1"
     },
     {
-      "src": "/(.*)",
-      "dest": "/frontend/index.html"
+      "source": "/(.*)",
+      "destination": "/frontend/index.html"
     }
   ]
 }
