@@ -37,10 +37,7 @@ export default function App() {
               <Route path="/agriculture" element={<Agriculture />} />
               <Route path="/events" element={<Events />} />
               <Route path="/youth" element={<Youth />} />
-              <Route path="/people" element={<People />} />
-              <Route path="/services" element={<Services />} />
               <Route path="/gallery" element={<Gallery />} />
-              <Route path="/announcements" element={<Announcements />} />
               <Route path="/contact" element={<Contact />} />
               <Route path="/privacy" element={<StaticPage title="Privacy Policy"><p>Placeholder privacy policy — replace with the village panchayat's actual policy.</p></StaticPage>} />
               <Route path="/terms" element={<StaticPage title="Terms"><p>Placeholder terms of use — replace with the village panchayat's actual terms.</p></StaticPage>} />

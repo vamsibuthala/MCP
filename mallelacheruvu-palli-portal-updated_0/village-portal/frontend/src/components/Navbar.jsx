@@ -11,10 +11,7 @@ const LINKS = [
   { to: '/agriculture', key: 'nav_agriculture' },
   { to: '/events', key: 'nav_events' },
   { to: '/youth', key: 'nav_youth' },
-  { to: '/people', key: 'nav_people' },
-  { to: '/services', key: 'nav_services' },
   { to: '/gallery', key: 'nav_gallery' },
-  { to: '/announcements', key: 'nav_announcements' },
   { to: '/contact', key: 'nav_contact' },
 ];
 

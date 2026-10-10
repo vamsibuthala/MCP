@@ -5,9 +5,14 @@ const { v4: uuidv4 } = require('uuid');
 
 // All uploaded photos (gallery, people) land here and are served statically
 // from /uploads by server.js.
-const UPLOAD_DIR = path.join(__dirname, '..', 'uploads');
+const isVercel = process.env.VERCEL || process.env.NODE_ENV === 'production';
+const UPLOAD_DIR = isVercel ? '/tmp/uploads' : path.join(__dirname, '..', 'uploads');
 if (!fs.existsSync(UPLOAD_DIR)) {
-  fs.mkdirSync(UPLOAD_DIR, { recursive: true });
+  try {
+    fs.mkdirSync(UPLOAD_DIR, { recursive: true });
+  } catch (err) {
+    console.warn('Could not create uploads dir:', err.message);
+  }
 }
 
 const ALLOWED_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/gif']);

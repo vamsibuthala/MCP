@@ -114,27 +114,16 @@ export default function Home() {
         </section>
       )}
 
-      {/* LATEST NEWS + UPCOMING EVENTS */}
+      {/* UPCOMING EVENTS */}
       <section className="section">
-        <div className="container grid-2" style={{ gap: 48 }}>
-          <div>
-            <span className="eyebrow">Latest News</span>
-            <h2 style={{ marginBottom: 24 }}>Announcements</h2>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-              {announcements.length === 0 && <p>No announcements yet.</p>}
-              {announcements.map((a) => <AnnouncementCard key={a.id} announcement={a} />)}
-            </div>
-            <Link to="/announcements" className="btn btn--outline" style={{ marginTop: 20 }}>View All Announcements</Link>
+        <div className="container" style={{ maxWidth: 800 }}>
+          <span className="eyebrow">Upcoming Events</span>
+          <h2 style={{ marginBottom: 24 }}>What's happening</h2>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+            {events.length === 0 && <p>No upcoming events yet.</p>}
+            {events.map((e) => <EventCard key={e.id} event={e} />)}
           </div>
-          <div>
-            <span className="eyebrow">Upcoming Events</span>
-            <h2 style={{ marginBottom: 24 }}>What's happening</h2>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-              {events.length === 0 && <p>No upcoming events yet.</p>}
-              {events.map((e) => <EventCard key={e.id} event={e} />)}
-            </div>
-            <Link to="/events" className="btn btn--outline" style={{ marginTop: 20 }}>See All Events</Link>
-          </div>
+          <Link to="/events" className="btn btn--outline" style={{ marginTop: 20 }}>See All Events</Link>
         </div>
       </section>
 

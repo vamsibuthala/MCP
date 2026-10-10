@@ -15,7 +15,7 @@ router.post('/login', asyncHandler(async (req, res) => {
   if (typeof updError !== 'undefined' && updError) throw updError;
   if (typeof insError !== 'undefined' && insError) throw insError;
 
-  if (!user || !(await verifyPassword(password, user.password_hash))) {
+  if (!user || !(await verifyPassword(password, user.password))) {
     return res.status(401).json({ detail: 'Invalid email or password' });
   }
 
