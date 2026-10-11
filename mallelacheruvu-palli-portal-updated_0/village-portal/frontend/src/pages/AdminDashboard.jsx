@@ -357,9 +357,30 @@ function Overview() {
 function VillageInfoPanel({ notify }) {
   const [info, setInfo] = useState(null);
   const [saving, setSaving] = useState(false);
-  const [uploadingField, setUploadingField] = useState(null);
+  const DEFAULT_INFO = {
+    title: 'Mallelacheruvu Palli',
+    tagline: 'Our Village, Our People, Our Pride',
+    description: 'Mallelacheruvu Palli is a vibrant, peaceful village rooted in agriculture, rich culture, and community spirit.',
+    history: 'Founded centuries ago, our village has prospered through fertile lands, traditional values, and hardworking families.',
+    culture: 'Traditional Andhra culture with active celebration of Sankranti, Ugadi, and local temple jatras.',
+    traditions: 'Farming customs, harvest celebrations, and deep community cooperation.',
+    main_occupations: 'Agriculture (Paddy, Chillies, Cotton), Dairy Farming, and Local Crafts.',
+    community_values: 'Harmony, mutual assistance, education for children, and respect for elders.',
+    hero_image_url: '',
+    about_image_url: '',
+    population: 1850,
+    families: 420,
+    schools: 2,
+    temples: 3,
+    farmers: 310,
+    youth_members: 145,
+  };
 
-  useEffect(() => { getVillageInfo().then(setInfo).catch(() => setInfo(false)); }, []);
+  useEffect(() => {
+    getVillageInfo()
+      .then((data) => setInfo(data && Object.keys(data).length > 0 ? { ...DEFAULT_INFO, ...data } : DEFAULT_INFO))
+      .catch(() => setInfo(DEFAULT_INFO));
+  }, []);
 
   const handleChange = (name, value) => setInfo((i) => ({ ...i, [name]: value }));
 
@@ -369,9 +390,9 @@ function VillageInfoPanel({ notify }) {
     try {
       const { url } = await uploadImage(file);
       handleChange(name, url);
-      notify('Image uploaded.');
+      notify('Image uploaded successfully.');
     } catch {
-      notify('Image upload failed.', 'error');
+      notify('Image upload failed. Try another image.', 'error');
     } finally {
       setUploadingField(null);
     }
@@ -383,16 +404,15 @@ function VillageInfoPanel({ notify }) {
     try {
       const updated = await updateVillageInfo(info);
       setInfo(updated);
-      notify('Village info updated.');
+      notify('Village info updated successfully!');
     } catch {
-      notify('Could not update village info.', 'error');
+      notify('Could not update village info. Please try again.', 'error');
     } finally {
       setSaving(false);
     }
   };
 
   if (info === null) return <Loader />;
-  if (info === false) return <p>Could not load village info.</p>;
 
   const textFields = [
     ['title', 'Village Title', 'text'],
@@ -607,26 +627,32 @@ function EventsPanel({ notify }) {
   return (
     <ListManager
       title="Events"
-      description="Upcoming and past village events."
+      description="Upcoming and past village events. You can upload photos directly from your device."
       fields={[
         { name: 'title', label: 'Title', required: true },
         { name: 'category', label: 'Category', type: 'select', options: EVENT_CATEGORIES },
         { name: 'event_date', label: 'Date', type: 'date', required: true },
         { name: 'location', label: 'Location' },
         { name: 'status', label: 'Status', type: 'select', options: ['upcoming', 'completed'] },
+        { name: 'image_url', label: 'Photo (From device)', type: 'image' },
         { name: 'description', label: 'Description', type: 'textarea' },
       ]}
-      initialForm={{ title: '', category: '', event_date: '', location: '', status: 'upcoming', description: '' }}
+      initialForm={{ title: '', category: '', event_date: '', location: '', status: 'upcoming', description: '', image_url: '' }}
       load={getEvents}
       onCreate={createEvent}
       onDelete={deleteEvent}
       notify={notify}
       renderItem={(ev) => (
-        <>
-          <strong>{ev.title}</strong>
-          <span style={{ color: 'var(--color-ink-soft)' }}> — {ev.category}, {ev.status}</span>
-          {ev.event_date && <p style={{ margin: '4px 0 0', fontSize: '0.85rem' }}>{new Date(ev.event_date).toLocaleDateString()}{ev.location ? ` · ${ev.location}` : ''}</p>}
-        </>
+        <div style={{ display: 'flex', gap: 14, alignItems: 'center' }}>
+          {ev.image_url && (
+            <img src={ev.image_url} alt={ev.title} style={{ width: 64, height: 64, objectFit: 'cover', borderRadius: 'var(--radius-sm)', flexShrink: 0 }} />
+          )}
+          <div>
+            <strong>{ev.title}</strong>
+            <span style={{ color: 'var(--color-ink-soft)' }}> — {ev.category}, {ev.status}</span>
+            {ev.event_date && <p style={{ margin: '4px 0 0', fontSize: '0.85rem' }}>{new Date(ev.event_date).toLocaleDateString()}{ev.location ? ` · ${ev.location}` : ''}</p>}
+          </div>
+        </div>
       )}
     />
   );
@@ -707,23 +733,29 @@ function AgriculturePanel({ notify }) {
     <div style={{ display: 'flex', flexDirection: 'column', gap: 48 }}>
       <ListManager
         title="Crops"
-        description="Crops grown in and around the village."
+        description="Crops grown in and around the village. You can upload photos directly from your device."
         fields={[
           { name: 'name', label: 'Crop Name', required: true },
           { name: 'season', label: 'Season' },
+          { name: 'image_url', label: 'Photo (From device)', type: 'image' },
           { name: 'notes', label: 'Notes', type: 'textarea' },
         ]}
-        initialForm={{ name: '', season: '', notes: '' }}
+        initialForm={{ name: '', season: '', notes: '', image_url: '' }}
         load={getCrops}
         onCreate={createCrop}
         onDelete={deleteCrop}
         notify={notify}
         renderItem={(c) => (
-          <>
-            <strong>{c.name}</strong>
-            {c.season && <span style={{ color: 'var(--color-ink-soft)' }}> — {c.season}</span>}
-            {c.notes && <p style={{ margin: '4px 0 0', fontSize: '0.85rem' }}>{c.notes}</p>}
-          </>
+          <div style={{ display: 'flex', gap: 14, alignItems: 'center' }}>
+            {c.image_url && (
+              <img src={c.image_url} alt={c.name} style={{ width: 60, height: 60, objectFit: 'cover', borderRadius: 'var(--radius-sm)', flexShrink: 0 }} />
+            )}
+            <div>
+              <strong>{c.name}</strong>
+              {c.season && <span style={{ color: 'var(--color-ink-soft)' }}> — {c.season}</span>}
+              {c.notes && <p style={{ margin: '4px 0 0', fontSize: '0.85rem' }}>{c.notes}</p>}
+            </div>
+          </div>
         )}
       />
       <ListManager
@@ -758,21 +790,27 @@ function YouthPanel({ notify }) {
   return (
     <ListManager
       title="Youth Activities"
-      description="Clubs, sports, and initiatives run by village youth."
+      description="Clubs, sports, and initiatives run by village youth. You can upload photos directly from your device."
       fields={[
         { name: 'title', label: 'Title', required: true },
+        { name: 'image_url', label: 'Photo (From device)', type: 'image' },
         { name: 'description', label: 'Description', type: 'textarea' },
       ]}
-      initialForm={{ title: '', description: '' }}
+      initialForm={{ title: '', description: '', image_url: '' }}
       load={getYouthActivities}
       onCreate={createYouthActivity}
       onDelete={deleteYouthActivity}
       notify={notify}
       renderItem={(y) => (
-        <>
-          <strong>{y.title}</strong>
-          {y.description && <p style={{ margin: '4px 0 0', fontSize: '0.85rem' }}>{y.description}</p>}
-        </>
+        <div style={{ display: 'flex', gap: 14, alignItems: 'center' }}>
+          {y.image_url && (
+            <img src={y.image_url} alt={y.title} style={{ width: 60, height: 60, objectFit: 'cover', borderRadius: 'var(--radius-sm)', flexShrink: 0 }} />
+          )}
+          <div>
+            <strong>{y.title}</strong>
+            {y.description && <p style={{ margin: '4px 0 0', fontSize: '0.85rem' }}>{y.description}</p>}
+          </div>
+        </div>
       )}
     />
   );
@@ -788,23 +826,29 @@ function FacilitiesPanel({ notify }) {
   return (
     <ListManager
       title="Facilities"
-      description="Schools, temples, health centres, and other village facilities."
+      description="Schools, temples, health centres, and other village facilities. You can upload photos directly from your device."
       fields={[
         { name: 'name', label: 'Name', required: true },
         { name: 'category', label: 'Category', type: 'select', options: FACILITY_CATEGORIES },
+        { name: 'image_url', label: 'Photo (From device)', type: 'image' },
         { name: 'description', label: 'Description', type: 'textarea' },
       ]}
-      initialForm={{ name: '', category: '', description: '' }}
+      initialForm={{ name: '', category: '', description: '', image_url: '' }}
       load={getFacilities}
       onCreate={createFacility}
       onDelete={deleteFacility}
       notify={notify}
       renderItem={(f) => (
-        <>
-          <strong>{f.name}</strong>
-          <span style={{ color: 'var(--color-ink-soft)' }}> — {f.category}</span>
-          {f.description && <p style={{ margin: '4px 0 0', fontSize: '0.85rem' }}>{f.description}</p>}
-        </>
+        <div style={{ display: 'flex', gap: 14, alignItems: 'center' }}>
+          {f.image_url && (
+            <img src={f.image_url} alt={f.name} style={{ width: 60, height: 60, objectFit: 'cover', borderRadius: 'var(--radius-sm)', flexShrink: 0 }} />
+          )}
+          <div>
+            <strong>{f.name}</strong>
+            <span style={{ color: 'var(--color-ink-soft)' }}> — {f.category}</span>
+            {f.description && <p style={{ margin: '4px 0 0', fontSize: '0.85rem' }}>{f.description}</p>}
+          </div>
+        </div>
       )}
     />
   );

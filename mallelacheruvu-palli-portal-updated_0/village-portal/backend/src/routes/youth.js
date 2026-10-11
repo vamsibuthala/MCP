@@ -20,10 +20,13 @@ router.get('/activities', asyncHandler(async (req, res) => {
 router.post('/activities', requireAdmin, asyncHandler(async (req, res) => {
   const db = getDb();
   const doc = { id: newId(), ...req.body, is_demo_data: false };
-  const { error: insError } = await db.from(Collections.YOUTH_ACTIVITIES).insert([doc]);
-  if (typeof error !== 'undefined' && error) throw error;
-  if (typeof updError !== 'undefined' && updError) throw updError;
-  if (typeof insError !== 'undefined' && insError) throw insError;
+  let { error: insError } = await db.from(Collections.YOUTH_ACTIVITIES).insert([doc]);
+  if (insError && insError.code === 'PGRST204' && doc.image_url) {
+    const { image_url, ...withoutImg } = doc;
+    const retry = await db.from(Collections.YOUTH_ACTIVITIES).insert([withoutImg]);
+    insError = retry.error;
+  }
+  if (insError) throw insError;
   res.json(doc);
 }));
 

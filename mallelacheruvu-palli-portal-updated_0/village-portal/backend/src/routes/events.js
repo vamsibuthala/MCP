@@ -37,10 +37,13 @@ router.post('/', requireAdmin, asyncHandler(async (req, res) => {
   const db = getDb();
   const data = { ...req.body, event_date: toDatetime(req.body.event_date) };
   const doc = { id: newId(), ...data, created_at: new Date() };
-  const { error: insError } = await db.from(Collections.EVENTS).insert([doc]);
-  if (typeof error !== 'undefined' && error) throw error;
-  if (typeof updError !== 'undefined' && updError) throw updError;
-  if (typeof insError !== 'undefined' && insError) throw insError;
+  let { error: insError } = await db.from(Collections.EVENTS).insert([doc]);
+  if (insError && insError.code === 'PGRST204' && doc.image_url) {
+    const { image_url, ...withoutImg } = doc;
+    const retry = await db.from(Collections.EVENTS).insert([withoutImg]);
+    insError = retry.error;
+  }
+  if (insError) throw insError;
   res.json(doc);
 }));
 

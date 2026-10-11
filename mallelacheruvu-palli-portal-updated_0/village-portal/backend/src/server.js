@@ -5,7 +5,6 @@ const cors = require('cors');
 
 const config = require('./config');
 const { connectDB } = require('./database');
-const { UPLOAD_DIR } = require('./upload');
 
 const authRoutes = require('./routes/auth');
 const villageRoutes = require('./routes/village');
@@ -28,9 +27,6 @@ async function start() {
   const app = express();
   app.use(express.json());
   app.use(cors({ origin: config.frontendOrigin, credentials: true }));
-
-  // Serves uploaded gallery/people photos (see backend/src/upload.js)
-  app.use('/uploads', express.static(UPLOAD_DIR));
 
   app.get('/api/health', (req, res) => {
     res.json({ status: 'ok', service: 'mallelacheruvu-palli-portal-api' });

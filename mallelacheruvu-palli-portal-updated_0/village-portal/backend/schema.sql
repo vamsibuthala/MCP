@@ -38,6 +38,7 @@ CREATE TABLE facilities (
   name TEXT NOT NULL,
   category TEXT,
   description TEXT,
+  image_url TEXT,
   is_demo_data BOOLEAN DEFAULT false
 );
 
@@ -46,6 +47,7 @@ CREATE TABLE crops (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   name TEXT NOT NULL,
   season TEXT,
+  image_url TEXT,
   notes TEXT
 );
 
@@ -65,6 +67,7 @@ CREATE TABLE events (
   event_date DATE,
   location TEXT,
   status TEXT,
+  image_url TEXT,
   description TEXT,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
@@ -134,6 +137,7 @@ CREATE TABLE important_contacts (
 CREATE TABLE youth_activities (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   title TEXT NOT NULL,
+  image_url TEXT,
   description TEXT
 );
 
