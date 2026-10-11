@@ -27,6 +27,10 @@
       "destination": "/frontend/assets/$1"
     },
     {
+      "source": "/logo.jpg",
+      "destination": "/frontend/logo.jpg"
+    },
+    {
       "source": "/(.*)",
       "destination": "/frontend/index.html"
     }
