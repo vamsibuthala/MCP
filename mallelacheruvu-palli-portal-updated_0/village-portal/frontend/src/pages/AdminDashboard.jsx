@@ -18,22 +18,21 @@ import {
   getYouthActivities, createYouthActivity, deleteYouthActivity,
   getAllFeedback, reviewFeedback, deleteFeedback,
   getPendingMemories, moderateMemory,
+  changePassword,
 } from '../api/endpoints';
 
 const TABS = [
   { key: 'overview', label: 'Overview' },
   { key: 'village', label: 'Village Info' },
-  { key: 'people', label: 'Our People' },
   { key: 'gallery', label: 'Gallery' },
   { key: 'events', label: 'Events' },
-  { key: 'announcements', label: 'Announcements' },
-  { key: 'services', label: 'Services' },
   { key: 'agriculture', label: 'Agriculture' },
   { key: 'youth', label: 'Youth Activities' },
   { key: 'facilities', label: 'Facilities' },
   { key: 'contacts', label: 'Important Contacts' },
   { key: 'feedback', label: 'Feedback' },
   { key: 'memories', label: 'Memories' },
+  { key: 'security', label: 'Security & Password' },
 ];
 
 export default function AdminDashboard() {
@@ -98,17 +97,15 @@ export default function AdminDashboard() {
         <div className="admin-panel" style={{ minWidth: 0, width: '100%' }}>
           {tab === 'overview' && <Overview />}
           {tab === 'village' && <VillageInfoPanel notify={notify} />}
-          {tab === 'people' && <PeoplePanel notify={notify} />}
           {tab === 'gallery' && <GalleryPanel notify={notify} />}
           {tab === 'events' && <EventsPanel notify={notify} />}
-          {tab === 'announcements' && <AnnouncementsPanel notify={notify} />}
-          {tab === 'services' && <ServicesPanel notify={notify} />}
           {tab === 'agriculture' && <AgriculturePanel notify={notify} />}
           {tab === 'youth' && <YouthPanel notify={notify} />}
           {tab === 'facilities' && <FacilitiesPanel notify={notify} />}
           {tab === 'contacts' && <ContactsPanel notify={notify} />}
           {tab === 'feedback' && <FeedbackPanel notify={notify} />}
           {tab === 'memories' && <MemoriesPanel notify={notify} />}
+          {tab === 'security' && <SecurityPanel notify={notify} />}
         </div>
       </div>
 
@@ -922,6 +919,106 @@ function MemoriesPanel({ notify }) {
           ))}
         </ul>
       )}
+    </div>
+  );
+}
+
+/* ---------------------------------------------------------------- */
+/* Security & Password Management                                    */
+/* ---------------------------------------------------------------- */
+
+function SecurityPanel({ notify }) {
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+
+    if (!newPassword || newPassword.trim().length < 4) {
+      setError('New password must be at least 4 characters long.');
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      setError('New passwords do not match. Please verify.');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      await changePassword({
+        currentPassword: currentPassword || undefined,
+        newPassword: newPassword.trim(),
+      });
+      notify('Password updated successfully! Please keep your new password safe.');
+      setCurrentPassword('');
+      setNewPassword('');
+      setConfirmPassword('');
+    } catch (err) {
+      const msg = err.response?.data?.detail || 'Failed to update password. Please check your credentials.';
+      setError(msg);
+      notify(msg, 'error');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div>
+      <PanelHeader
+        title="Admin Security & Password"
+        description="Change your login password at any time. Choose a password you can easily remember."
+      />
+      <div className="card" style={{ maxWidth: 520, padding: '32px 28px' }}>
+        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
+          <Field label="Current Password (Optional if first change)">
+            <input
+              type="password"
+              value={currentPassword}
+              onChange={(e) => setCurrentPassword(e.target.value)}
+              placeholder="Enter current password"
+              style={inputStyle}
+            />
+          </Field>
+
+          <Field label="New Password">
+            <input
+              type="password"
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+              placeholder="At least 4 characters"
+              required
+              style={inputStyle}
+            />
+          </Field>
+
+          <Field label="Confirm New Password">
+            <input
+              type="password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              placeholder="Re-type new password"
+              required
+              style={inputStyle}
+            />
+          </Field>
+
+          {error && (
+            <p role="alert" style={{ color: '#B3432E', fontSize: '0.88rem', margin: 0, fontWeight: 600 }}>
+              {error}
+            </p>
+          )}
+
+          <div style={{ marginTop: 8 }}>
+            <button type="submit" className="btn btn--primary" disabled={loading}>
+              {loading ? 'Updating Password…' : 'Update Password'}
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 }

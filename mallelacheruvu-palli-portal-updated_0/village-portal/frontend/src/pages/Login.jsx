@@ -23,8 +23,8 @@ export default function Login() {
       await login(username.trim(), password);
       const dest = location.state?.from?.pathname || '/admin/dashboard';
       navigate(dest, { replace: true });
-    } catch {
-      setError('Incorrect username or password.');
+    } catch (err) {
+      setError(err.response?.data?.detail || 'Incorrect username or password.');
     } finally {
       setLoading(false);
     }
