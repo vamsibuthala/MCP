@@ -43,8 +43,18 @@ router.put('/info', requireAdmin, asyncHandler(async (req, res) => {
   const { data: info, error: err_info } = await db.from(Collections.VILLAGE_INFO).select('*').limit(1).maybeSingle();
   if (err_info) throw err_info;
 
-  const { id: _ignoreId, ...rest } = req.body;
-  const updates = { ...rest, is_demo_data: false };
+  const allowedKeys = [
+    'title', 'tagline', 'description', 'history', 'culture',
+    'traditions', 'main_occupations', 'community_values',
+    'hero_image_url', 'about_image_url',
+    'population', 'families', 'schools', 'temples', 'farmers', 'youth_members',
+  ];
+  const updates = { is_demo_data: false };
+  for (const key of allowedKeys) {
+    if (req.body[key] !== undefined) {
+      updates[key] = req.body[key];
+    }
+  }
 
   if (!info) {
     const doc = { id: newId(), ...updates };
@@ -69,8 +79,6 @@ router.get('/facilities', asyncHandler(async (req, res) => {
   const query = category ? { category } : {};
   const { data: docs, error: err_docs } = await db.from(Collections.FACILITIES).select('*').match(query).limit(500);
   if (err_docs) throw err_docs;
-  if (typeof updError !== 'undefined' && updError) throw updError;
-  if (typeof insError !== 'undefined' && insError) throw insError;
   res.json(docs);
 }));
 

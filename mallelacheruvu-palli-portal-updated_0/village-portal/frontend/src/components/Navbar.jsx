@@ -50,7 +50,7 @@ export default function Navbar() {
       <header
       style={{
         position: 'sticky', top: 0, zIndex: 100,
-        background: scrolled ? 'rgba(251,248,241,0.95)' : 'rgba(251,248,241,0.85)',
+        background: scrolled ? 'rgba(243, 248, 242, 0.96)' : 'rgba(243, 248, 242, 0.88)',
         backdropFilter: 'blur(8px)',
         borderBottom: scrolled ? '1px solid var(--color-line)' : '1px solid transparent',
         transition: 'all 0.25s ease',

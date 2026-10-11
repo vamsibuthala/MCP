@@ -25,11 +25,20 @@ export default function About() {
   return (
     <section className="section">
       <div className="container">
-        <SectionHeading eyebrow="About Us" title="About Mallelacheruvu Palli" align="center"
-          description={info?.is_demo_data ? 'The details below are placeholder demo data until an administrator updates them.' : ''} />
+        <SectionHeading eyebrow="About Us" title="About Mallelacheruvu Palli" align="center" />
         <div className="grid-2" style={{ gap: 48, alignItems: 'start' }}>
-          <div style={{ background: 'var(--color-bg-alt)', borderRadius: 'var(--radius-lg)', aspectRatio: '4/3', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'sticky', top: 100 }}>
-            <span style={{ color: 'var(--color-ink-soft)', fontSize: '0.85rem' }}>Village photo placeholder</span>
+          <div style={{ background: 'var(--color-bg-alt)', borderRadius: 'var(--radius-lg)', aspectRatio: '4/3', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'sticky', top: 100, border: '1px solid var(--color-line)', boxShadow: 'var(--shadow-card)' }}>
+            {info?.about_image_url ? (
+              <img src={info.about_image_url} alt="Mallelacheruvu Palli Village" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+            ) : info?.hero_image_url ? (
+              <img src={info.hero_image_url} alt="Mallelacheruvu Palli Village" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+            ) : (
+              <div style={{ textAlign: 'center', padding: 24, color: 'var(--color-ink-soft)' }}>
+                <span style={{ fontSize: '3rem', display: 'block', marginBottom: 10 }}>🌾</span>
+                <strong style={{ fontSize: '1.05rem', color: 'var(--color-paddy)' }}>Mallelacheruvu Palli</strong>
+                <p style={{ fontSize: '0.82rem', margin: '6px 0 0', color: 'var(--color-ink-soft)' }}>Upload village photos in Admin Dashboard to showcase our village.</p>
+              </div>
+            )}
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 28 }}>
             {blocks.map(([title, text]) => (

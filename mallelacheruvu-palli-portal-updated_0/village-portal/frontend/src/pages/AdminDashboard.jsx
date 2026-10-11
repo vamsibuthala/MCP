@@ -357,29 +357,12 @@ function Overview() {
 function VillageInfoPanel({ notify }) {
   const [info, setInfo] = useState(null);
   const [saving, setSaving] = useState(false);
-  const DEFAULT_INFO = {
-    title: 'Mallelacheruvu Palli',
-    tagline: 'Our Village, Our People, Our Pride',
-    description: 'Mallelacheruvu Palli is a vibrant, peaceful village rooted in agriculture, rich culture, and community spirit.',
-    history: 'Founded centuries ago, our village has prospered through fertile lands, traditional values, and hardworking families.',
-    culture: 'Traditional Andhra culture with active celebration of Sankranti, Ugadi, and local temple jatras.',
-    traditions: 'Farming customs, harvest celebrations, and deep community cooperation.',
-    main_occupations: 'Agriculture (Paddy, Chillies, Cotton), Dairy Farming, and Local Crafts.',
-    community_values: 'Harmony, mutual assistance, education for children, and respect for elders.',
-    hero_image_url: '',
-    about_image_url: '',
-    population: 1850,
-    families: 420,
-    schools: 2,
-    temples: 3,
-    farmers: 310,
-    youth_members: 145,
-  };
+  const [uploadingField, setUploadingField] = useState(null);
 
   useEffect(() => {
     getVillageInfo()
-      .then((data) => setInfo(data && Object.keys(data).length > 0 ? { ...DEFAULT_INFO, ...data } : DEFAULT_INFO))
-      .catch(() => setInfo(DEFAULT_INFO));
+      .then((data) => setInfo(data || {}))
+      .catch(() => setInfo({}));
   }, []);
 
   const handleChange = (name, value) => setInfo((i) => ({ ...i, [name]: value }));

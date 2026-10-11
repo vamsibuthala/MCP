@@ -38,6 +38,7 @@ export default function Home() {
   return (
     <>
       {/* HERO */}
+      {/* HERO */}
       <section
         className="hero-section"
         style={{
@@ -45,7 +46,9 @@ export default function Home() {
           minHeight: '86vh',
           display: 'flex',
           alignItems: 'center',
-          background: 'linear-gradient(160deg, #2C4C2A 0%, #2E6068 100%)',
+          background: info?.hero_image_url
+            ? `linear-gradient(160deg, rgba(18, 54, 25, 0.82) 0%, rgba(22, 78, 35, 0.88) 100%), url(${info.hero_image_url}) center/cover no-repeat`
+            : 'linear-gradient(160deg, #163B20 0%, #255F32 50%, #3D8548 100%)',
           overflow: 'hidden',
         }}
       >
@@ -54,13 +57,15 @@ export default function Home() {
           style={{ position: 'absolute', bottom: -2, left: 0, width: '100%', height: 120 }}
           viewBox="0 0 1440 120" preserveAspectRatio="none"
         >
-          <path d="M0,64 C240,110 480,20 720,50 C960,80 1200,110 1440,64 L1440,120 L0,120 Z" fill="#FBF8F1" />
+          <path d="M0,64 C240,110 480,20 720,50 C960,80 1200,110 1440,64 L1440,120 L0,120 Z" fill="var(--color-bg)" />
         </svg>
         <div className="container hero-content" style={{ position: 'relative', zIndex: 2, paddingTop: 80, paddingBottom: 140 }}>
-          <span className="eyebrow" style={{ color: '#E8C97A' }}>Andhra Pradesh, India</span>
-          <h1 style={{ color: '#fff', maxWidth: 780 }}>{t('hero_title')}</h1>
-          <p style={{ color: 'rgba(255,255,255,0.88)', fontSize: '1.15rem', maxWidth: 560 }}>{t('hero_sub')}</p>
-          <p style={{ color: 'rgba(255,255,255,0.78)', maxWidth: 560, marginBottom: 32 }}>
+          <span className="eyebrow" style={{ color: '#F1D88A' }}>Andhra Pradesh, India</span>
+          <h1 style={{ color: '#fff', maxWidth: 780 }}>{info?.title || t('hero_title')}</h1>
+          <p style={{ color: 'rgba(255,255,255,0.92)', fontSize: '1.2rem', maxWidth: 580, fontWeight: 500 }}>
+            {info?.tagline || t('hero_sub')}
+          </p>
+          <p style={{ color: 'rgba(255,255,255,0.82)', maxWidth: 580, marginBottom: 32 }}>
             {info?.description || 'This portal connects villagers, showcases our culture, and shares useful information for everyone who calls Mallelacheruvu Palli home.'}
           </p>
           <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap', marginBottom: 56 }}>
@@ -77,8 +82,8 @@ export default function Home() {
             <StatCounter label="Youth Members" value={info?.youth_members || 0} />
           </div>
           {info?.is_demo_data && (
-            <p style={{ color: 'rgba(255,255,255,0.55)', fontSize: '0.78rem', marginTop: 18 }}>
-              Figures above are placeholder demo data until an administrator updates them.
+            <p style={{ color: 'rgba(255,255,255,0.65)', fontSize: '0.78rem', marginTop: 18 }}>
+              Figures above can be updated anytime by the administrator.
             </p>
           )}
         </div>
@@ -90,11 +95,20 @@ export default function Home() {
           <div>
             <span className="eyebrow">About Us</span>
             <h2>A village shaped by field, faith and family</h2>
-            <p>{info?.history || 'DEMO DATA — the village history will appear here once added by an administrator.'}</p>
+            <p>{info?.history || info?.description || 'Learn more about the rich agricultural heritage and vibrant community of our village.'}</p>
             <Link to="/about" className="btn btn--outline">{t('know_more')}</Link>
           </div>
-          <div style={{ background: 'var(--color-bg-alt)', borderRadius: 'var(--radius-lg)', aspectRatio: '4/3', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <span style={{ color: 'var(--color-ink-soft)', fontSize: '0.85rem' }}>Village photo placeholder</span>
+          <div style={{ background: 'var(--color-bg-alt)', borderRadius: 'var(--radius-lg)', aspectRatio: '4/3', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid var(--color-line)' }}>
+            {info?.about_image_url ? (
+              <img src={info.about_image_url} alt="Mallelacheruvu Palli" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+            ) : info?.hero_image_url ? (
+              <img src={info.hero_image_url} alt="Mallelacheruvu Palli" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+            ) : (
+              <div style={{ textAlign: 'center', padding: 24, color: 'var(--color-ink-soft)' }}>
+                <span style={{ fontSize: '2.5rem', display: 'block', marginBottom: 8 }}>🌾</span>
+                <span style={{ fontSize: '0.9rem', fontWeight: 600 }}>Mallelacheruvu Palli Village</span>
+              </div>
+            )}
           </div>
         </div>
       </section>

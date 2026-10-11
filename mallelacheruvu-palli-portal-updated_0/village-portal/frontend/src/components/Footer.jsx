@@ -28,7 +28,7 @@ export default function Footer() {
         <div>
           <h4 style={{ color: '#fff', fontSize: '0.95rem', marginBottom: 12 }}>Community</h4>
           <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 8 }}>
-            {[['Services', '/services'], ['Gallery', '/gallery'], ['Announcements', '/announcements'], ['Contact', '/contact']].map(([label, to]) => (
+            {[['Agriculture', '/agriculture'], ['Village Facilities', '/village'], ['Gallery', '/gallery'], ['Contact', '/contact']].map(([label, to]) => (
               <li key={to}><Link to={to} style={{ color: 'rgba(255,255,255,0.75)', fontSize: '0.9rem' }}>{label}</Link></li>
             ))}
           </ul>
