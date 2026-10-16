@@ -453,6 +453,51 @@ function VillageInfoPanel({ notify }) {
             </Field>
           ))}
         </div>
+
+        <div style={{ marginTop: 10, paddingTop: 16, borderTop: '1px solid var(--color-line)' }}>
+          <h4 style={{ margin: '0 0 10px', color: 'var(--color-paddy-dark)', display: 'flex', alignItems: 'center', gap: 6 }}>
+            <span>🗺️</span> Village Location & Google Maps
+          </h4>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 14 }}>
+            <Field label="Village Address / Landmark">
+              <input
+                value={info.location_address || ''}
+                placeholder="Mallelacheruvu Palli, Andhra Pradesh, India"
+                onChange={(e) => handleChange('location_address', e.target.value)}
+                style={inputStyle}
+              />
+            </Field>
+            <Field label="Google Maps Embed URL (iframe embed)">
+              <input
+                value={info.map_embed_url || ''}
+                placeholder="https://maps.google.com/maps?q=Mallelacheruvu+Palli,+Andhra+Pradesh&t=&z=14&ie=UTF8&iwloc=&output=embed"
+                onChange={(e) => handleChange('map_embed_url', e.target.value)}
+                style={inputStyle}
+              />
+            </Field>
+            <Field label="Google Maps Directions / Location Link">
+              <input
+                value={info.directions_url || ''}
+                placeholder="https://www.google.com/maps/dir/?api=1&destination=Mallelacheruvu+Palli,+Andhra+Pradesh"
+                onChange={(e) => handleChange('directions_url', e.target.value)}
+                style={inputStyle}
+              />
+            </Field>
+          </div>
+          {info.map_embed_url && (
+            <div style={{ marginTop: 14, borderRadius: 'var(--radius-sm)', overflow: 'hidden', border: '1px solid var(--color-line)' }}>
+              <iframe
+                src={info.map_embed_url}
+                title="Admin Map Preview"
+                width="100%"
+                height="200"
+                style={{ border: 0, display: 'block' }}
+                loading="lazy"
+              />
+            </div>
+          )}
+        </div>
+
         <button type="submit" className="btn btn--primary" disabled={saving || !!uploadingField} style={{ alignSelf: 'flex-start', padding: '11px 26px' }}>
           {uploadingField ? 'Uploading…' : saving ? 'Saving…' : 'Save Changes'}
         </button>
@@ -502,45 +547,52 @@ const GALLERY_CATEGORIES = ['village', 'nature', 'festivals', 'agriculture', 'yo
 
 function GalleryPanel({ notify }) {
   const [items, setItems] = useState(null);
-  const [form, setForm] = useState({ title: '', category: '', image_url: '' });
-  const [file, setFile] = useState(null);
+  const [form, setForm] = useState({ title: '', category: 'festivals', images: [] });
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
 
   const refresh = useCallback(async () => setItems(await getGallery()), []);
   useEffect(() => { refresh(); }, [refresh]);
 
-  const handleFileChange = async (e) => {
-    const f = e.target.files?.[0];
-    if (!f) return;
-    setFile(f);
+  const handleFilesChange = async (e) => {
+    const files = Array.from(e.target.files || []);
+    if (files.length === 0) return;
     setUploading(true);
     try {
-      const { url } = await uploadImage(f);
-      setForm((old) => ({ ...old, image_url: url }));
-      notify('Image uploaded.');
+      const results = await Promise.all(files.map(uploadImage));
+      const urls = results.map(r => r.url).filter(Boolean);
+      setForm((old) => ({ ...old, images: [...old.images, ...urls] }));
+      notify(`Uploaded ${urls.length} photo${urls.length > 1 ? 's' : ''}.`);
     } catch {
-      notify('Image upload failed.', 'error');
+      notify('Photo upload failed. Please try another image.', 'error');
     } finally {
       setUploading(false);
+      e.target.value = '';
     }
+  };
+
+  const removePhoto = (idxToRemove) => {
+    setForm(old => ({ ...old, images: old.images.filter((_, idx) => idx !== idxToRemove) }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!form.image_url) {
-      notify('Upload an image first.', 'error');
+    if (form.images.length === 0) {
+      notify('Please select and upload at least one photo first.', 'error');
       return;
     }
     setSaving(true);
     try {
-      await createGalleryItem(form);
-      setForm({ title: '', category: '', image_url: '' });
-      setFile(null);
+      if (form.images.length === 1) {
+        await createGalleryItem({ title: form.title, category: form.category, image_url: form.images[0] });
+      } else {
+        await createGalleryItem({ title: form.title, category: form.category, images: form.images });
+      }
+      setForm({ title: '', category: 'festivals', images: [] });
       await refresh();
-      notify('Photo added to the gallery.');
+      notify('Photo(s) added to the gallery successfully!');
     } catch {
-      notify('Could not add that photo.', 'error');
+      notify('Could not add photos. Please check and try again.', 'error');
     } finally {
       setSaving(false);
     }
@@ -558,28 +610,49 @@ function GalleryPanel({ notify }) {
 
   return (
     <div>
-      <PanelHeader title="Gallery" description="Upload photos of the village, festivals, and everyday life straight from your device." />
+      <PanelHeader title="Gallery" description="Upload photos of the village, festivals, and everyday life straight from your device. You can select one or more photos." />
 
       <form onSubmit={handleSubmit} className="card" style={{ display: 'flex', flexDirection: 'column', gap: 14, marginBottom: 28, padding: 24 }}>
-        <Field label="Photo">
-          <input type="file" accept="image/*" onChange={handleFileChange} />
+        <Field label="Upload Photos (Select one or multiple from device)">
+          <input type="file" accept="image/*" multiple onChange={handleFilesChange} />
+          {uploading && <span style={{ fontSize: '0.8rem', color: 'var(--color-paddy)' }}>Uploading selected photos to storage…</span>}
         </Field>
-        {form.image_url && (
-          <img src={form.image_url} alt="Selected upload preview" style={{ width: 160, borderRadius: 'var(--radius-sm)', objectFit: 'cover' }} />
+
+        {form.images.length > 0 && (
+          <div>
+            <div style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--color-ink-soft)', marginBottom: 6 }}>
+              Uploaded Photos ({form.images.length}):
+            </div>
+            <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+              {form.images.map((url, idx) => (
+                <div key={url + idx} style={{ position: 'relative', width: 90, height: 70, borderRadius: 'var(--radius-sm)', overflow: 'hidden', border: '1px solid var(--color-line)' }}>
+                  <img src={url} alt={`Upload preview ${idx + 1}`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  <button
+                    type="button"
+                    onClick={() => removePhoto(idx)}
+                    style={{ position: 'absolute', top: 2, right: 2, background: 'rgba(0,0,0,0.7)', color: '#fff', border: 'none', borderRadius: '50%', width: 20, height: 20, fontSize: '0.7rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                    title="Remove"
+                  >
+                    ✕
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
         )}
+
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 14 }}>
-          <Field label="Title">
-            <input value={form.title} onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))} style={inputStyle} />
+          <Field label="Title / Caption">
+            <input value={form.title} placeholder="e.g. Vinayaka Chavithi 2k26" onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))} style={inputStyle} />
           </Field>
           <Field label="Category">
             <select value={form.category} onChange={(e) => setForm((f) => ({ ...f, category: e.target.value }))} style={inputStyle}>
-              <option value="" disabled>Choose…</option>
               {GALLERY_CATEGORIES.map((c) => <option key={c} value={c}>{c.replace('_', ' ')}</option>)}
             </select>
           </Field>
         </div>
         <button type="submit" className="btn btn--primary" disabled={saving || uploading} style={{ alignSelf: 'flex-start', padding: '10px 24px' }}>
-          {uploading ? 'Uploading…' : saving ? 'Saving…' : 'Add to Gallery'}
+          {uploading ? 'Uploading…' : saving ? 'Saving…' : `Add ${form.images.length > 1 ? `${form.images.length} Photos` : 'Photo'} to Gallery`}
         </button>
       </form>
 
@@ -589,7 +662,7 @@ function GalleryPanel({ notify }) {
             <div key={img.id || img._id} className="card" style={{ padding: 10 }}>
               <img src={img.image_url} alt={img.title || 'Village gallery photo'} style={{ width: '100%', height: 130, objectFit: 'cover', borderRadius: 'var(--radius-sm)' }} />
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 8 }}>
-                <span style={{ fontSize: '0.82rem' }}>{img.title || 'Untitled'}</span>
+                <span style={{ fontSize: '0.82rem', fontWeight: 600 }}>{img.title || 'Untitled'}</span>
                 <DeleteButton onClick={() => handleDelete(img.id || img._id)} />
               </div>
             </div>
@@ -601,43 +674,202 @@ function GalleryPanel({ notify }) {
 }
 
 /* ---------------------------------------------------------------- */
-/* Events                                                             */
+/* Events (with multi-photo upload)                                 */
 /* ---------------------------------------------------------------- */
 
 const EVENT_CATEGORIES = ['festival', 'sports', 'cultural', 'youth', 'community', 'meeting'];
 
 function EventsPanel({ notify }) {
+  const [items, setItems] = useState(null);
+  const [form, setForm] = useState({
+    title: '',
+    category: 'festival',
+    event_date: '',
+    location: '',
+    status: 'upcoming',
+    description: '',
+    images: [],
+  });
+  const [uploading, setUploading] = useState(false);
+  const [saving, setSaving] = useState(false);
+
+  const refresh = useCallback(async () => {
+    const data = await getEvents();
+    setItems(data);
+  }, []);
+
+  useEffect(() => { refresh(); }, [refresh]);
+
+  const handleMultipleEventPhotos = async (e) => {
+    const files = Array.from(e.target.files || []);
+    if (files.length === 0) return;
+    setUploading(true);
+    try {
+      const results = await Promise.all(files.map(uploadImage));
+      const urls = results.map(r => r.url).filter(Boolean);
+      setForm((old) => ({ ...old, images: [...old.images, ...urls] }));
+      notify(`Uploaded ${urls.length} photo${urls.length > 1 ? 's' : ''} for event.`);
+    } catch {
+      notify('Photo upload failed. Please try again.', 'error');
+    } finally {
+      setUploading(false);
+      e.target.value = '';
+    }
+  };
+
+  const removePhoto = (idxToRemove) => {
+    setForm(old => ({ ...old, images: old.images.filter((_, idx) => idx !== idxToRemove) }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!form.title.trim()) {
+      notify('Please enter an event title.', 'error');
+      return;
+    }
+    setSaving(true);
+    try {
+      await createEvent({
+        ...form,
+        image_url: form.images[0] || null,
+      });
+      setForm({
+        title: '',
+        category: 'festival',
+        event_date: '',
+        location: '',
+        status: 'upcoming',
+        description: '',
+        images: [],
+      });
+      await refresh();
+      notify('Event with photos created successfully!');
+    } catch {
+      notify('Could not save event. Check the fields and try again.', 'error');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleDelete = async (id) => {
+    try {
+      await deleteEvent(id);
+      await refresh();
+      notify('Event removed.');
+    } catch {
+      notify('Could not remove that event.', 'error');
+    }
+  };
+
   return (
-    <ListManager
-      title="Events"
-      description="Upcoming and past village events. You can upload photos directly from your device."
-      fields={[
-        { name: 'title', label: 'Title', required: true },
-        { name: 'category', label: 'Category', type: 'select', options: EVENT_CATEGORIES },
-        { name: 'event_date', label: 'Date', type: 'date', required: true },
-        { name: 'location', label: 'Location' },
-        { name: 'status', label: 'Status', type: 'select', options: ['upcoming', 'completed'] },
-        { name: 'image_url', label: 'Photo (From device)', type: 'image' },
-        { name: 'description', label: 'Description', type: 'textarea' },
-      ]}
-      initialForm={{ title: '', category: '', event_date: '', location: '', status: 'upcoming', description: '', image_url: '' }}
-      load={getEvents}
-      onCreate={createEvent}
-      onDelete={deleteEvent}
-      notify={notify}
-      renderItem={(ev) => (
-        <div style={{ display: 'flex', gap: 14, alignItems: 'center' }}>
-          {ev.image_url && (
-            <img src={ev.image_url} alt={ev.title} style={{ width: 64, height: 64, objectFit: 'cover', borderRadius: 'var(--radius-sm)', flexShrink: 0 }} />
-          )}
-          <div>
-            <strong>{ev.title}</strong>
-            <span style={{ color: 'var(--color-ink-soft)' }}> — {ev.category}, {ev.status}</span>
-            {ev.event_date && <p style={{ margin: '4px 0 0', fontSize: '0.85rem' }}>{new Date(ev.event_date).toLocaleDateString()}{ev.location ? ` · ${ev.location}` : ''}</p>}
-          </div>
+    <div>
+      <PanelHeader title="Events" description="Upcoming and past village events. You can upload one or more photos directly from your device." />
+
+      <form onSubmit={handleSubmit} className="card" style={{ display: 'flex', flexDirection: 'column', gap: 14, marginBottom: 28, padding: 24 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 14 }}>
+          <Field label="Event Title *">
+            <input required value={form.title} placeholder="e.g. Vinayaka Chavithi 2k26" onChange={(e) => setForm(f => ({ ...f, title: e.target.value }))} style={inputStyle} />
+          </Field>
+          <Field label="Category">
+            <select value={form.category} onChange={(e) => setForm(f => ({ ...f, category: e.target.value }))} style={inputStyle}>
+              {EVENT_CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
+            </select>
+          </Field>
+          <Field label="Event Date *">
+            <input required type="date" value={form.event_date} onChange={(e) => setForm(f => ({ ...f, event_date: e.target.value }))} style={inputStyle} />
+          </Field>
+          <Field label="Location">
+            <input value={form.location} placeholder="e.g. Village Temple Ground" onChange={(e) => setForm(f => ({ ...f, location: e.target.value }))} style={inputStyle} />
+          </Field>
+          <Field label="Status">
+            <select value={form.status} onChange={(e) => setForm(f => ({ ...f, status: e.target.value }))} style={inputStyle}>
+              <option value="upcoming">Upcoming</option>
+              <option value="completed">Completed</option>
+            </select>
+          </Field>
         </div>
+
+        {/* Multi-photo upload section */}
+        <Field label="Event Photos (Upload 1 or more photos from device)">
+          <input type="file" accept="image/*" multiple onChange={handleMultipleEventPhotos} />
+          {uploading && <span style={{ fontSize: '0.8rem', color: 'var(--color-paddy)' }}>Uploading photos…</span>}
+        </Field>
+
+        {form.images.length > 0 && (
+          <div>
+            <div style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--color-ink-soft)', marginBottom: 6 }}>
+              Event Photos Ready ({form.images.length}):
+            </div>
+            <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+              {form.images.map((url, idx) => (
+                <div key={url + idx} style={{ position: 'relative', width: 90, height: 70, borderRadius: 'var(--radius-sm)', overflow: 'hidden', border: '1px solid var(--color-line)' }}>
+                  <img src={url} alt={`Event photo ${idx + 1}`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  <button
+                    type="button"
+                    onClick={() => removePhoto(idx)}
+                    style={{ position: 'absolute', top: 2, right: 2, background: 'rgba(0,0,0,0.7)', color: '#fff', border: 'none', borderRadius: '50%', width: 20, height: 20, fontSize: '0.7rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                    title="Remove"
+                  >
+                    ✕
+                  </button>
+                  {idx === 0 && (
+                    <span style={{ position: 'absolute', bottom: 0, left: 0, right: 0, background: 'rgba(45,125,50,0.85)', color: '#fff', fontSize: '0.62rem', textAlign: 'center', fontWeight: 700 }}>
+                      Primary
+                    </span>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        <Field label="Description">
+          <textarea rows={3} value={form.description} placeholder="Event details, schedule, highlights…" onChange={(e) => setForm(f => ({ ...f, description: e.target.value }))} style={{ ...inputStyle, resize: 'vertical' }} />
+        </Field>
+
+        <button type="submit" className="btn btn--primary" disabled={saving || uploading} style={{ alignSelf: 'flex-start', padding: '10px 24px' }}>
+          {uploading ? 'Uploading Photos…' : saving ? 'Saving…' : `Save Event (${form.images.length} Photo${form.images.length !== 1 ? 's' : ''})`}
+        </button>
+      </form>
+
+      {items === null ? <Loader /> : items.length === 0 ? <p style={{ color: 'var(--color-ink-soft)' }}>No events yet.</p> : (
+        <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: 14 }}>
+          {items.map((ev) => {
+            const evPhotos = Array.isArray(ev.images) && ev.images.length > 0 ? ev.images : (ev.image_url ? [ev.image_url] : []);
+            return (
+              <li key={ev.id || ev._id} className="card" style={{ padding: '14px 18px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 14, flexWrap: 'wrap' }}>
+                <div style={{ display: 'flex', gap: 14, alignItems: 'center', flex: 1, minWidth: 240 }}>
+                  {evPhotos.length > 0 ? (
+                    <div style={{ display: 'flex', gap: 6, flexShrink: 0, overflowX: 'auto', maxWidth: 180 }}>
+                      {evPhotos.slice(0, 3).map((pUrl, pIdx) => (
+                        <img key={pUrl + pIdx} src={pUrl} alt={ev.title} style={{ width: 56, height: 56, objectFit: 'cover', borderRadius: 'var(--radius-sm)' }} />
+                      ))}
+                      {evPhotos.length > 3 && (
+                        <div style={{ width: 56, height: 56, borderRadius: 'var(--radius-sm)', background: 'var(--color-bg-alt)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.75rem', fontWeight: 700, color: 'var(--color-paddy)' }}>
+                          +{evPhotos.length - 3}
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <div style={{ width: 56, height: 56, borderRadius: 'var(--radius-sm)', background: 'var(--color-bg-alt)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.2rem', flexShrink: 0 }}>
+                      📅
+                    </div>
+                  )}
+                  <div>
+                    <strong>{ev.title}</strong>
+                    <span style={{ color: 'var(--color-ink-soft)' }}> — {ev.category}, {ev.status}</span>
+                    {evPhotos.length > 0 && <span style={{ marginLeft: 8, fontSize: '0.75rem', color: 'var(--color-paddy)', fontWeight: 600 }}>({evPhotos.length} photo{evPhotos.length > 1 ? 's' : ''})</span>}
+                    {ev.event_date && <p style={{ margin: '4px 0 0', fontSize: '0.85rem' }}>{new Date(ev.event_date).toLocaleDateString()}{ev.location ? ` · ${ev.location}` : ''}</p>}
+                    {ev.description && <p style={{ margin: '4px 0 0', fontSize: '0.82rem', color: 'var(--color-ink-soft)' }}>{ev.description}</p>}
+                  </div>
+                </div>
+                <DeleteButton onClick={() => handleDelete(ev.id || ev._id)} />
+              </li>
+            );
+          })}
+        </ul>
       )}
-    />
+    </div>
   );
 }
 

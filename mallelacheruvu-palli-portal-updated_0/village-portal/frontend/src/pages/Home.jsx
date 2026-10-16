@@ -71,6 +71,9 @@ export default function Home() {
           <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap', marginBottom: 56 }}>
             <Link to="/village" className="btn btn--primary">{t('explore')}</Link>
             <Link to="/gallery" className="btn btn--secondary">{t('view_gallery')}</Link>
+            <Link to="/village#village-map" className="btn btn--secondary" style={{ background: 'rgba(255,255,255,0.15)', color: '#fff', border: '1px solid rgba(255,255,255,0.4)', backdropFilter: 'blur(6px)' }}>
+              🗺️ Locate Village
+            </Link>
           </div>
 
           <div className="grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(110px, 1fr))', gap: 8 }}>
@@ -160,6 +163,45 @@ export default function Home() {
           </div>
         </section>
       )}
+
+      {/* LOCATE VILLAGE & MAP SECTION */}
+      <section className="section">
+        <div className="container">
+          <div className="grid-2" style={{ gap: 40, alignItems: 'center' }}>
+            <div>
+              <span className="eyebrow">Find Our Village</span>
+              <h2>Locate Mallelacheruvu Palli on the Map</h2>
+              <p style={{ fontSize: '1.05rem', lineHeight: 1.6, color: 'var(--color-ink-soft)' }}>
+                Nestled in Andhra Pradesh, our village is surrounded by lush green paddy fields and peaceful countryside. Explore landmarks, find key facilities, or navigate directly to the village.
+              </p>
+              <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginTop: 24 }}>
+                <Link to="/village#village-map" className="btn btn--primary">
+                  🗺️ Open Interactive Map
+                </Link>
+                <a
+                  href={info?.directions_url || "https://www.google.com/maps/dir/?api=1&destination=Mallelacheruvu+Palli,+Andhra+Pradesh"}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn btn--outline"
+                >
+                  🚗 Get Driving Directions
+                </a>
+              </div>
+            </div>
+            <div style={{ borderRadius: 'var(--radius-lg)', overflow: 'hidden', border: '1px solid var(--color-line)', height: 320, boxShadow: 'var(--shadow-card)' }}>
+              <iframe
+                title="Home Village Map"
+                src={info?.map_embed_url || "https://maps.google.com/maps?q=Mallelacheruvu+Palli,+Andhra+Pradesh&t=&z=14&ie=UTF8&iwloc=&output=embed"}
+                width="100%"
+                height="100%"
+                style={{ border: 0, display: 'block' }}
+                loading="lazy"
+                allowFullScreen=""
+              />
+            </div>
+          </div>
+        </div>
+      </section>
 
       {/* OUR PRIDE + QUOTE */}
       <section className="section" style={{ textAlign: 'center' }}>

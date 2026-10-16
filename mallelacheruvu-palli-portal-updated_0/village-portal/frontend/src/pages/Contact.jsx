@@ -53,10 +53,33 @@ export default function Contact() {
                 <button type="submit" className="btn btn--primary" style={{ alignSelf: 'flex-start' }}>Send Message</button>
               </form>
             </div>
-            <div style={{ background: 'var(--color-bg-alt)', borderRadius: 'var(--radius-lg)', minHeight: 260, display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: 8 }}>
-              <span style={{ fontSize: '2rem' }}>📍</span>
-              <p style={{ margin: 0, color: 'var(--color-ink-soft)' }}>Mallelacheruvu Palli, Andhra Pradesh</p>
-              <p style={{ margin: 0, fontSize: '0.8rem', color: 'var(--color-ink-soft)' }}>Map placeholder — connect a map API here.</p>
+            <div style={{ background: 'var(--color-bg-alt)', borderRadius: 'var(--radius-lg)', overflow: 'hidden', border: '1px solid var(--color-line)', display: 'flex', flexDirection: 'column' }}>
+              <div style={{ padding: '14px 18px', background: 'var(--color-white)', borderBottom: '1px solid var(--color-line)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 10 }}>
+                <div>
+                  <strong style={{ display: 'block', fontSize: '0.95rem', color: 'var(--color-ink)' }}>📍 Mallelacheruvu Palli</strong>
+                  <span style={{ fontSize: '0.8rem', color: 'var(--color-ink-soft)' }}>Andhra Pradesh, India</span>
+                </div>
+                <a
+                  href="https://www.google.com/maps/dir/?api=1&destination=Mallelacheruvu+Palli,+Andhra+Pradesh"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn btn--primary"
+                  style={{ padding: '6px 14px', fontSize: '0.8rem' }}
+                >
+                  🚗 Get Directions
+                </a>
+              </div>
+              <div style={{ width: '100%', height: 260 }}>
+                <iframe
+                  title="Contact Village Map"
+                  src="https://maps.google.com/maps?q=Mallelacheruvu+Palli,+Andhra+Pradesh&t=&z=14&ie=UTF8&iwloc=&output=embed"
+                  width="100%"
+                  height="100%"
+                  style={{ border: 0, display: 'block' }}
+                  loading="lazy"
+                  allowFullScreen=""
+                />
+              </div>
             </div>
           </div>
         </div>
